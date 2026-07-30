@@ -1,24 +1,4 @@
-const fs = require('fs');
-const path = require('path');
-const filePath = path.join(__dirname, '..', 'friend-name.json');
-
-function loadSavedNames() {
-  if (!fs.existsSync(filePath)) return [];
-  try {
-    const data = fs.readFileSync(filePath, 'utf8').trim();
-    if (!data) return [];
-    const parsed = JSON.parse(data);
-    if (Array.isArray(parsed)) return parsed;
-    if (parsed && typeof parsed === 'object') return [parsed];
-  } catch (error) {
-    console.warn('Could not parse friend-name.json:', error);
-  }
-  return [];
-}
-
-function saveNames(names) {
-  fs.writeFileSync(filePath, JSON.stringify(names, null, 2) + '\n', 'utf8');
-}
+const { loadSavedNames, saveNames } = require('./storage');
 
 function parseJsonBody(req) {
   return new Promise((resolve, reject) => {
@@ -56,9 +36,9 @@ module.exports = async (req, res) => {
       name: name.trim(),
       createdAt: new Date().toISOString(),
     };
-    const names = loadSavedNames();
+    const names = await loadSavedNames();
     names.push(payload);
-    saveNames(names);
+    await saveNames(names);
 
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify({ success: true }));

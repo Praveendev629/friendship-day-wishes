@@ -195,9 +195,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = canvas.getContext('2d');
     scratchContext = ctx;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.fillStyle = 'rgba(200, 200, 200, 0.95)';
+    ctx.fillStyle = 'rgba(180, 0, 0, 0.96)';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     ctx.globalCompositeOperation = 'destination-out';
+    ctx.lineWidth = 54;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 1)';
 
     scratchHint.textContent = 'Scratch to reveal';
     scratchNextButton.classList.add('hidden');
@@ -223,6 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function endScratch() {
     if (!isScratching) return;
     isScratching = false;
+    lastScratch = null;
     checkScratchProgress();
   }
 
@@ -231,9 +236,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const rect = scratchCanvas.getBoundingClientRect();
     const x = ((event.clientX - rect.left) / rect.width) * scratchCanvas.width;
     const y = ((event.clientY - rect.top) / rect.height) * scratchCanvas.height;
+
+    scratchContext.beginPath();
+    if (lastScratch) {
+      scratchContext.moveTo(lastScratch.x, lastScratch.y);
+      scratchContext.lineTo(x, y);
+      scratchContext.stroke();
+    }
     scratchContext.beginPath();
     scratchContext.arc(x, y, 32, 0, Math.PI * 2);
     scratchContext.fill();
+
+    lastScratch = { x, y };
   }
 
   function checkScratchProgress() {

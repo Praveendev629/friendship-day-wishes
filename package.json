@@ -1,0 +1,12 @@
+{
+  "name": "friendship-day-wishes",
+  "version": "1.0.0",
+  "description": "Friendship Day surprise loader with name entry and certificate data save.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.22.2"
+  }
+}

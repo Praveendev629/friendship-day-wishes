@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friendship Day Surprise</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="wrapper">
+    <section class="hero-panel">
+      <div class="loading-card">
+        <p class="intro-text">Wait a few seconds...</p>
+        <h1 class="surprise-text">Your surprise is loading</h1>
+        <div class="circle-holder">
+          <svg class="progress-ring" width="220" height="220" viewBox="0 0 220 220">
+            <defs>
+              <linearGradient id="gradientStroke" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ff2040" />
+                <stop offset="100%" stop-color="#b300ff" />
+              </linearGradient>
+            </defs>
+            <circle class="ring-bg" cx="110" cy="110" r="95" stroke-width="18" />
+            <circle class="ring-progress" cx="110" cy="110" r="95" stroke-width="18" />
+          </svg>
+          <div class="counter">5</div>
+        </div>
+      </div>
+      <div class="name-card hidden">
+        <div class="name-bg"></div>
+        <p class="name-label">Enter your name</p>
+        <p class="name-funny">If you don’t type your name, the surprise stays hidden forever 😜</p>
+        <input id="nameInput" class="name-input" type="text" placeholder="Friend's name" aria-label="Enter name" />
+        <button id="nextButton" class="next-button hidden" type="button">Next</button>
+      </div>
+      <div class="video-card hidden">
+        <video id="surpriseVideo" class="surprise-video" playsinline preload="auto">
+          <source src="assets/video 1.mp4" type="video/mp4">
+          Your browser does not support video playback.
+        </video>
+      </div>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

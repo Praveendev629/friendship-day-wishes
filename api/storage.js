@@ -7,6 +7,9 @@ const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY;
 const supabase = SUPABASE_URL && SUPABASE_KEY ? createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 const TABLE_NAME = 'friend_names';
+const CREATED_AT_COLUMN = 'createdat';
+const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+const isDev = !isProduction;
 
 function loadFileNames() {
   if (!fs.existsSync(filePath)) return [];
@@ -26,50 +29,60 @@ function saveFileNames(names) {
 }
 
 async function loadSavedNames() {
-  if (supabase) {
-    try {
-      const { data, error } = await supabase
-        .from(TABLE_NAME)
-        .select('*')
-        .order('createdAt', { ascending: true });
-
-      if (error) {
-        console.warn('Supabase read failed, falling back to file storage:', error);
-      } else if (Array.isArray(data)) {
-        return data.map((item) => ({ name: item.name, createdAt: item.createdAt }));
-      }
-    } catch (error) {
-      console.warn('Supabase query failed, falling back to file storage:', error);
-    }
+  if (!supabase) {
+    if (isDev) return loadFileNames();
+    throw new Error('Supabase not configured. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.');
   }
 
-  return loadFileNames();
+  try {
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .select('*')
+      .order(CREATED_AT_COLUMN, { ascending: true });
+
+    if (error) {
+      throw error;
+    }
+
+    if (Array.isArray(data)) {
+      return data.map((item) => ({ name: item.name, createdAt: item.createdat }));
+    }
+
+    return [];
+  } catch (error) {
+    if (isDev) {
+      console.warn('Supabase read failed, using local file storage instead:', error);
+      return loadFileNames();
+    }
+    throw error;
+  }
 }
 
 async function saveNames(names) {
-  if (supabase) {
-    try {
-      const latest = names[names.length - 1];
-      const { data, error } = await supabase
-        .from(TABLE_NAME)
-        .insert([{ name: latest.name, createdAt: latest.createdAt }]);
-
-      if (!error) {
-        return { success: true, source: 'supabase', data };
-      }
-
-      console.warn('Supabase write failed:', error);
+  if (!supabase) {
+    if (isDev) {
       saveFileNames(names);
-      return { success: true, source: 'file', warning: error.message };
-    } catch (error) {
-      console.warn('Supabase insert failed:', error);
+      return { success: true, source: 'file', warning: 'Supabase not configured' };
+    }
+    throw new Error('Supabase not configured. Please set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.');
+  }
+
+  try {
+    const latest = names[names.length - 1];
+    const { data, error } = await supabase
+      .from(TABLE_NAME)
+      .insert([{ name: latest.name, createdat: latest.createdAt }]);
+
+    if (error) throw error;
+    return { success: true, source: 'supabase', data };
+  } catch (error) {
+    if (isDev) {
+      console.warn('Supabase insert failed, using local file storage instead:', error);
       saveFileNames(names);
       return { success: true, source: 'file', warning: error.message };
     }
+    throw error;
   }
-
-  saveFileNames(names);
-  return { success: true, source: 'file', warning: 'Supabase not configured' };
 }
 
 module.exports = {

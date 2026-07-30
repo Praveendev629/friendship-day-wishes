@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/*.js", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/save-name", "dest": "/api/save-name.js" },
+    { "src": "/friend-names", "dest": "/api/friend-names.js" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}

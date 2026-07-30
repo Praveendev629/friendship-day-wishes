@@ -39,6 +39,26 @@
           Your browser does not support video playback.
         </video>
       </div>
+      <div class="scratch-card hidden">
+        <div class="scratch-stage">
+          <img id="scratchImage" src="assets/img.jpeg" alt="Scratch reveal image" />
+          <canvas id="scratchCanvas" class="scratch-canvas" aria-label="Scratch to reveal"></canvas>
+          <div class="scratch-hint">Scratch to reveal</div>
+        </div>
+        <button id="scratchNextButton" class="next-button hidden" type="button">Next</button>
+      </div>
+      <div class="friendship-scene hidden">
+        <div class="wish-box">
+          <div id="wishText" class="wish-text"></div>
+          <span id="wishCaret" class="typing-caret">|</span>
+        </div>
+        <button id="proceedButton" class="proceed-button hidden" type="button">See certificate processing</button>
+        <div class="preparing-panel hidden">
+          <div class="gear-icon" aria-hidden="true"></div>
+          <p class="preparing-text">Certificate of friendship is being made… please be patient</p>
+        </div>
+        <a class="name-label" href="names.html">View submitted names</a>
+      </div>
     </section>
   </main>
   <script src="script.js"></script>

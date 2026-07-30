@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Submitted Names</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="wrapper">
+    <section class="hero-panel names-panel">
+      <h1 class="surprise-text">Submitted Names</h1>
+      <p class="name-funny">This list shows all names that have been entered so far on the deployed site.</p>
+      <div id="namesContainer" class="names-container">
+        <div class="loading-card">
+          <p class="intro-text">Loading names...</p>
+        </div>
+      </div>
+      <button id="reloadNames" class="next-button visible" type="button">Refresh list</button>
+      <a class="name-label" href="index.html">Back to the surprise</a>
+    </section>
+  </main>
+  <script>
+    async function loadNames() {
+      const container = document.getElementById('namesContainer');
+      container.innerHTML = '<div class="loading-card"><p class="intro-text">Loading names...</p></div>';
+
+      try {
+        const response = await fetch('/friend-names');
+        if (!response.ok) throw new Error('Failed to load names');
+        const data = await response.json();
+
+        if (!Array.isArray(data) || data.length === 0) {
+          container.innerHTML = '<p class="name-funny">No names have been entered yet. Try the surprise page first.</p>';
+          return;
+        }
+
+        const list = document.createElement('ol');
+        list.className = 'names-list';
+
+        data.forEach((entry) => {
+          const item = document.createElement('li');
+          item.className = 'names-list-item';
+          item.textContent = entry.name + (entry.createdAt ? ` — ${new Date(entry.createdAt).toLocaleString()}` : '');
+          list.appendChild(item);
+        });
+
+        container.innerHTML = '';
+        container.appendChild(list);
+      } catch (error) {
+        container.innerHTML = '<p class="name-funny">Unable to load names right now. Please refresh.</p>';
+        console.error(error);
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadNames();
+      document.getElementById('reloadNames').addEventListener('click', loadNames);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Friendship Certificate</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="wrapper certificate-page">
+    <section class="hero-panel certificate-panel">
+      <div class="preparing-panel certificate-loading">
+        <div class="gear-icon" aria-hidden="true"></div>
+        <p class="preparing-text">Preparing your certificate... please wait</p>
+      </div>
+      <div class="certificate-output hidden">
+        <div class="certificate-image-wrapper">
+          <canvas id="certificateCanvas" class="certificate-canvas" aria-label="Generated friendship certificate"></canvas>
+          <div id="scrollNotice" class="scroll-notice hidden">
+            Scroll down to see more
+            <span class="scroll-arrow">↓</span>
+          </div>
+        </div>
+        <button id="downloadButton" class="download-button hidden" type="button">
+          <span class="button-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span>
+          Download certificate
+        </button>
+        <button id="shareWishButton" class="download-button hidden" type="button">
+          <span class="button-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"/><path d="M16 6l-4-4-4 4"/><line x1="12" y1="2" x2="12" y2="14"/></svg></span>
+          Share your wish to another friend
+        </button>
+        <div class="share-buttons hidden" id="shareButtons">
+          <button id="instagramButton" class="download-button hidden" type="button">
+            <span class="button-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="2.5" width="19" height="19" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.5" y2="6.5"/></svg></span>
+            share this on Instagram
+          </button>
+          <button id="whatsappButton" class="download-button hidden" type="button">
+            <span class="button-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.01 11.5c0 4.72-3.84 8.56-8.56 8.56a8.51 8.51 0 0 1-4.32-1.17L2 22l1.3-6.13A8.47 8.47 0 0 1 3.44 11.5c0-4.72 3.84-8.56 8.56-8.56s8.56 3.84 8.56 8.56Z"/><path d="m17.14 14.66-1.09 1.03c-.14.13-.36.2-.55.17-.46-.07-1.3-.46-2.2-1.1-.81-.57-1.43-1.3-1.57-1.45-.14-.15-.25-.25-.4-.26-.07-.01-.31-.01-.61-.01s-1.07.15-1.63.69c-.51.48-.74 1.09-.86 1.37-.09.2-.43 1.11-1.18 1.9-.48.52-1.07.58-1.26.6-.19.02-.59.03-1.13-.3-.53-.3-1.75-1.72-1.75-4.22 0-2.52 1.63-3.73 2.09-4.17.47-.45 1.03-.6 1.37-.6.35 0 .7.01 1.01.01.33.01.77-.12 1.18.57.4.7 1.31 2.35 1.41 2.53.09.18.14.38.03.61-.1.2-.29.62-.42.84-.14.23-.28.26-.52.15-.24-.11-1.05-.39-1.89-1.2-.7-.67-1.17-1.4-1.31-1.6-.14-.2-.02-.31.08-.41.08-.08.18-.19.27-.29.09-.09.12-.16.18-.26.05-.1.02-.18-.01-.26-.03-.09-.52-1.25-.71-1.72-.18-.45-.36-.39-.51-.4-.13-.01-.28 0-.43 0-.17 0-.44.06-.67.28-.23.23-.87.85-.87 2.07 0 1.22.89 2.41 1.01 2.57.12.16 1.76 2.7 4.27 3.79.6.26 1.07.41 1.44.52.6.17 1.15.15 1.58.09.48-.07 1.47-.6 1.68-1.18.22-.59.22-1.08.15-1.18-.07-.1-.26-.16-.56-.28Z"/></svg></span>
+           share this on  WhatsApp
+          </button>
+        </div>
+        <div id="scrollNotice" class="scroll-notice hidden">
+          Scroll down to see more
+          <span class="scroll-arrow">↓</span>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const certificatePanel = document.querySelector('.certificate-panel');
+      const loadingPanel = document.querySelector('.certificate-loading');
+      const certificateOutput = document.querySelector('.certificate-output');
+      const certificateCanvas = document.getElementById('certificateCanvas');
+      const downloadButton = document.getElementById('downloadButton');
+      const instagramButton = document.getElementById('instagramButton');
+      const whatsappButton = document.getElementById('whatsappButton');
+      const shareWishButton = document.getElementById('shareWishButton');
+      const shareButtons = document.getElementById('shareButtons');
+      const scrollNotice = document.getElementById('scrollNotice');
+
+      certificatePanel.classList.remove('hidden');
+
+      const params = new URLSearchParams(window.location.search);
+      const queryName = params.get('name');
+      const name = queryName || localStorage.getItem('certificateName') || 'Beloved Friend';
+      const shareUrlBase = 'https://click-it.vercel.app';
+      const shareUrl = queryName
+        ? `${shareUrlBase}?name=${encodeURIComponent(name)}`
+        : shareUrlBase;
+      const wishMessage = `Happy Friendship Day, ${name}! I made this special certificate just for you. 💌`;
+      const image = new Image();
+      image.src = 'assets/certificate.png';
+
+      try {
+        await new Promise((resolve, reject) => {
+          image.onload = resolve;
+          image.onerror = reject;
+        });
+
+        const canvas = certificateCanvas;
+        const context = canvas.getContext('2d');
+        canvas.width = image.naturalWidth;
+        canvas.height = image.naturalHeight;
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+        const padding = 40;
+        const x = padding + 140;
+        const y = canvas.height - padding;
+        context.font = `${Math.max(Math.floor(canvas.width / 18) - 20, 16)}px Lucida Handwriting, cursive`;
+        context.fillStyle = '#ff2040';
+        context.textAlign = 'left';
+        context.textBaseline = 'bottom';
+        context.shadowColor = 'rgba(0,0,0,0.35)';
+        context.shadowOffsetX = 2;
+        context.shadowOffsetY = 2;
+        context.shadowBlur = 4;
+        context.fillText(name, x, y);
+      } catch (error) {
+        console.error('Certificate image failed to load:', error);
+        loadingPanel.classList.add('hidden');
+        certificateOutput.classList.remove('hidden');
+        certificateOutput.innerHTML = '<p class="preparing-text">Unable to generate the certificate right now. Try refreshing the page.</p>';
+        return;
+      }
+
+      setTimeout(() => {
+        loadingPanel.classList.add('hidden');
+        certificateOutput.classList.remove('hidden');
+        certificateOutput.classList.add('fade-in');
+        shareButtons.classList.remove('hidden');
+        shareButtons.classList.add('visible');
+        downloadButton.classList.remove('hidden');
+        downloadButton.classList.add('visible');
+        instagramButton.classList.remove('hidden');
+        instagramButton.classList.add('visible');
+        whatsappButton.classList.remove('hidden');
+        whatsappButton.classList.add('visible');
+        shareWishButton.classList.remove('hidden');
+        shareWishButton.classList.add('visible');
+        scrollNotice.classList.remove('hidden');
+        scrollNotice.classList.add('visible');
+        setTimeout(() => scrollNotice.classList.remove('visible'), 4200);
+      }, 1200);
+
+      downloadButton.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.href = certificateCanvas.toDataURL('image/png');
+        link.download = `${name || 'friendship-certificate'}.png`;
+        link.click();
+      });
+
+      instagramButton.addEventListener('click', () => {
+        const instagramShareUrl = `https://www.instagram.com/?url=${encodeURIComponent(shareUrl)}`;
+        window.open(instagramShareUrl, '_blank');
+      });
+
+      whatsappButton.addEventListener('click', () => {
+        const text = `Check out my Friendship Certificate for ${name}: ${shareUrl}`;
+        const whatsappShareUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+        window.open(whatsappShareUrl, '_blank');
+      });
+
+      shareWishButton.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(`${wishMessage} ${shareUrl}`);
+          shareWishButton.textContent = 'Wish copied!';
+          setTimeout(() => {
+            shareWishButton.textContent = 'Share your wish';
+          }, 1800);
+        } catch (err) {
+          console.error('Copy wish failed', err);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

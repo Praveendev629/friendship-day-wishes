@@ -1,7 +1,11 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/*.js", "use": "@vercel/node" }
+    { "src": "api/*.js", "use": "@vercel/node" },
+    { "src": "*.html", "use": "@vercel/static" },
+    { "src": "styles.css", "use": "@vercel/static" },
+    { "src": "script.js", "use": "@vercel/static" },
+    { "src": "assets/**/*", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "/save-name", "dest": "/api/save-name.js" },

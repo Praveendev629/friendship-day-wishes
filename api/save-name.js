@@ -38,10 +38,10 @@ module.exports = async (req, res) => {
     };
     const names = await loadSavedNames();
     names.push(payload);
-    await saveNames(names);
+    const result = await saveNames(names);
 
     res.setHeader('Content-Type', 'application/json');
-    res.end(JSON.stringify({ success: true }));
+    res.end(JSON.stringify({ success: true, storage: result.source, warning: result.warning || null }));
   } catch (error) {
     console.error(error);
     res.statusCode = 500;

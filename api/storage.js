@@ -50,21 +50,26 @@ async function saveNames(names) {
   if (supabase) {
     try {
       const latest = names[names.length - 1];
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from(TABLE_NAME)
         .insert([{ name: latest.name, createdAt: latest.createdAt }]);
 
       if (!error) {
-        return;
+        return { success: true, source: 'supabase', data };
       }
 
-      console.warn('Supabase write failed, falling back to file storage:', error);
+      console.warn('Supabase write failed:', error);
+      saveFileNames(names);
+      return { success: true, source: 'file', warning: error.message };
     } catch (error) {
-      console.warn('Supabase insert failed, falling back to file storage:', error);
+      console.warn('Supabase insert failed:', error);
+      saveFileNames(names);
+      return { success: true, source: 'file', warning: error.message };
     }
   }
 
   saveFileNames(names);
+  return { success: true, source: 'file', warning: 'Supabase not configured' };
 }
 
 module.exports = {
